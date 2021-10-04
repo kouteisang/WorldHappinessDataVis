@@ -6,6 +6,7 @@ RUN pip3 install dash
 RUN pip3 install dash-html-components
 RUN pip3 install dash-core-components
 RUN pip3 install dash-table
+RUN pip3 install statsmodels
 
 COPY . .
 EXPOSE 8080
