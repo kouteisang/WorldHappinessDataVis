@@ -9,9 +9,21 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import statsmodels
+
+#add external stylesheet
+external_stylesheets = [
+    {
+        'href': 'https://use.fontawesome.com/releases/v5.8.1/css/all.css',
+        'rel': 'stylesheet',
+        'integrity': 'sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf',
+        'crossorigin': 'anonymous'
+    }
+]
 
 
-app = dash.Dash(__name__)
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 all_country_option = ['Finland', 'Denmark', 'Switzerland', 'Iceland', 'Netherlands', 'Norway', 'Sweden', 'Luxembourg', 'New Zealand', 'Austria', 'Australia', 'Israel', 'Germany', 'Canada', 'Ireland', 'Costa Rica', 'United Kingdom', 'Czech Republic', 'United States', 'Belgium', 'France', 'Bahrain', 'Malta', 'Taiwan Province of China', 'United Arab Emirates', 'Saudi Arabia', 'Spain', 'Italy', 'Slovenia', 'Guatemala', 'Uruguay', 'Singapore', 'Kosovo', 'Slovakia', 'Brazil', 'Mexico', 'Jamaica', 'Lithuania', 'Cyprus', 'Estonia', 'Panama', 'Uzbekistan', 'Chile', 'Poland', 'Kazakhstan', 'Romania', 'Kuwait', 'Serbia', 'El Salvador', 'Mauritius', 'Latvia', 'Colombia', 'Hungary', 'Thailand', 'Nicaragua', 'Japan', 'Argentina', 'Portugal', 'Honduras', 'Croatia', 'Philippines', 'South Korea', 'Peru', 'Bosnia and Herzegovina', 'Moldova', 'Ecuador', 'Kyrgyzstan', 'Greece', 'Bolivia', 'Mongolia', 'Paraguay', 'Montenegro', 'Dominican Republic', 'North Cyprus', 'Belarus', 'Russia', 'Hong Kong S.A.R. of China', 'Tajikistan', 'Vietnam', 'Libya', 'Malaysia', 'Indonesia', 'Congo (Brazzaville)', 'China', 'Ivory Coast', 'Armenia', 'Nepal', 'Bulgaria', 'Maldives', 'Azerbaijan', 'Cameroon', 'Senegal', 'Albania', 'North Macedonia', 'Ghana', 'Niger', 'Turkmenistan', 'Gambia', 'Benin', 'Laos', 'Bangladesh', 'Guinea', 'South Africa', 'Turkey', 'Pakistan', 'Morocco', 'Venezuela', 'Georgia', 'Algeria', 'Ukraine', 'Iraq', 'Gabon', 'Burkina Faso', 'Cambodia', 'Mozambique', 'Nigeria', 'Mali', 'Iran', 'Uganda', 'Liberia', 'Kenya', 'Tunisia', 'Lebanon', 'Namibia', 'Palestinian Territories', 'Myanmar', 'Jordan', 'Chad', 'Sri Lanka', 'Swaziland', 'Comoros', 'Egypt', 'Ethiopia', 'Mauritania', 'Madagascar', 'Togo', 'Zambia', 'Sierra Leone', 'India', 'Burundi', 'Yemen', 'Tanzania', 'Haiti', 'Malawi', 'Lesotho', 'Botswana', 'Rwanda', 'Zimbabwe', 'Afghanistan', 'Finland', 'Denmark', 'Switzerland', 'Iceland', 'Netherlands', 'Norway', 'Sweden', 'Luxembourg', 'New Zealand', 'Austria', 'Australia', 'Israel', 'Germany', 'Canada', 'Ireland', 'Costa Rica', 'United Kingdom', 'Czech Republic', 'United States', 'Belgium', 'France', 'Bahrain', 'Malta', 'Taiwan Province of China', 'United Arab Emirates', 'Saudi Arabia', 'Spain', 'Italy', 'Slovenia', 'Guatemala', 'Uruguay', 'Singapore', 'Kosovo', 'Slovakia', 'Brazil', 'Mexico', 'Jamaica', 'Lithuania', 'Cyprus', 'Estonia', 'Panama', 'Uzbekistan', 'Chile', 'Poland', 'Kazakhstan', 'Romania', 'Kuwait', 'Serbia', 'El Salvador', 'Mauritius', 'Latvia', 'Colombia', 'Hungary', 'Thailand', 'Nicaragua', 'Japan', 'Argentina', 'Portugal', 'Honduras', 'Croatia', 'Philippines', 'South Korea', 'Peru', 'Bosnia and Herzegovina', 'Moldova', 'Ecuador', 'Kyrgyzstan', 'Greece', 'Bolivia', 'Mongolia', 'Paraguay', 'Montenegro', 'Dominican Republic', 'North Cyprus', 'Belarus', 'Russia', 'Hong Kong S.A.R. of China', 'Tajikistan', 'Vietnam', 'Libya', 'Malaysia', 'Indonesia', 'Congo (Brazzaville)', 'China', 'Ivory Coast', 'Armenia', 'Nepal', 'Bulgaria', 'Maldives', 'Azerbaijan', 'Cameroon', 'Senegal', 'Albania', 'North Macedonia', 'Ghana', 'Niger', 'Turkmenistan', 'Gambia', 'Benin', 'Laos', 'Bangladesh', 'Guinea', 'South Africa', 'Turkey', 'Pakistan', 'Morocco', 'Venezuela', 'Georgia', 'Algeria', 'Ukraine', 'Iraq', 'Gabon', 'Burkina Faso', 'Cambodia', 'Mozambique', 'Nigeria', 'Mali', 'Iran', 'Uganda', 'Liberia', 'Kenya', 'Tunisia', 'Lebanon', 'Namibia', 'Palestinian Territories', 'Myanmar', 'Jordan', 'Chad', 'Sri Lanka', 'Swaziland', 'Comoros', 'Egypt', 'Ethiopia', 'Mauritania', 'Madagascar', 'Togo', 'Zambia', 'Sierra Leone', 'India', 'Burundi', 'Yemen', 'Tanzania', 'Haiti', 'Malawi', 'Lesotho', 'Botswana', 'Rwanda', 'Zimbabwe', 'Afghanistan']
 app.layout = html.Div([
     html.H1("World Happiness Report Data Visulization from 2015 to 2021", style={'text-align': 'center','background-color':'#4797c6','color':'white'}),
@@ -34,11 +46,27 @@ app.layout = html.Div([
                 {'label': 'Economy', 'value': 'Economy'},
             ],
             value='Region',
-            id="select_region_economy"
-        )
+            id="select_region_economy",
+            style={'float':'left'}
+        ),
+        dcc.Dropdown(
+            options=[
+                {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
+                {'label': 'Social support', 'value': 'Social support'},
+                {'label': 'Health (Life Expectancy)', 'value': 'Health (Life Expectancy)'},
+                {'label': 'Freedom to make life choice', 'value': 'Freedom'},
+                {'label': 'Generosity', 'value': 'Generosity'},
+                {'label': 'Trust (Government Corruption)', 'value': 'Trust (Government Corruption)'},
+            ],
+            value='Economy (GDP per Capita)',
+            placeholder="select a factor",
+            id="select_factor",
+            style={'float': 'right','width':'60%','margin-right':'10%'}
+        ),
     ]),
     html.Div([
         dcc.Graph(id='pie_region_economy', style={'width': '40%', 'float': 'left'}),
+        dcc.Graph(id='dot_factor_graph', style = {'width':'60%', 'float':'right'})
         ]
     ),
     html.Div([
@@ -57,10 +85,9 @@ app.layout = html.Div([
         [dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
          dcc.Graph(id='all_country_compare_rank', style={'width': '45%','float': 'left'})],
 
-    )
+    ),
 
 ])
-
 
 #remember to change in the future
 def getValue(year, way):
@@ -83,6 +110,32 @@ def getValue(year, way):
             values[dict.get(country['Region'])] += 1
     return values
 
+
+
+@app.callback(
+    Output(component_id='dot_factor_graph', component_property='figure'),
+    [
+        Input(component_id='select_year', component_property='value'),
+        Input(component_id='select_factor', component_property='value')
+    ]
+)
+def getFactorInfluence(year, factor):
+    print(year)
+    print(factor)
+    fileName = "2021.csv"
+    countries = pd.read_csv(fileName)
+    factorScore = []
+    totalScore = []
+    countryName = []
+    for index, country in countries.iterrows():
+        factorScore.append(country[factor])
+        totalScore.append(country["Happiness Score"])
+        countryName.append(country["Country"])
+    df = {}
+    df[factor]=factorScore
+    df["Total Score"] = totalScore
+    fig = px.scatter(df, x=factor, y="Total Score", trendline="ols", hover_name=countryName)
+    return fig
 
 
 @app.callback(
@@ -247,4 +300,4 @@ def yearCompare(year):
 
 
 if __name__ == '__main__':
-    app.run_server(host="0.0.0.0", debug=True)
+    app.run_server(host="0.0.0.0", port="8080", debug=True)
