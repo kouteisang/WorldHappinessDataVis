@@ -1,6 +1,5 @@
 import math
 import random
-
 import numpy as np
 import pandas as pd
 import plotly.express as px  # (version 4.7.0)
@@ -26,7 +25,7 @@ external_stylesheets = [
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 all_country_option = ['Finland', 'Denmark', 'Switzerland', 'Iceland', 'Netherlands', 'Norway', 'Sweden', 'Luxembourg', 'New Zealand', 'Austria', 'Australia', 'Israel', 'Germany', 'Canada', 'Ireland', 'Costa Rica', 'United Kingdom', 'Czech Republic', 'United States', 'Belgium', 'France', 'Bahrain', 'Malta', 'Taiwan Province of China', 'United Arab Emirates', 'Saudi Arabia', 'Spain', 'Italy', 'Slovenia', 'Guatemala', 'Uruguay', 'Singapore', 'Kosovo', 'Slovakia', 'Brazil', 'Mexico', 'Jamaica', 'Lithuania', 'Cyprus', 'Estonia', 'Panama', 'Uzbekistan', 'Chile', 'Poland', 'Kazakhstan', 'Romania', 'Kuwait', 'Serbia', 'El Salvador', 'Mauritius', 'Latvia', 'Colombia', 'Hungary', 'Thailand', 'Nicaragua', 'Japan', 'Argentina', 'Portugal', 'Honduras', 'Croatia', 'Philippines', 'South Korea', 'Peru', 'Bosnia and Herzegovina', 'Moldova', 'Ecuador', 'Kyrgyzstan', 'Greece', 'Bolivia', 'Mongolia', 'Paraguay', 'Montenegro', 'Dominican Republic', 'North Cyprus', 'Belarus', 'Russia', 'Hong Kong S.A.R. of China', 'Tajikistan', 'Vietnam', 'Libya', 'Malaysia', 'Indonesia', 'Congo (Brazzaville)', 'China', 'Ivory Coast', 'Armenia', 'Nepal', 'Bulgaria', 'Maldives', 'Azerbaijan', 'Cameroon', 'Senegal', 'Albania', 'North Macedonia', 'Ghana', 'Niger', 'Turkmenistan', 'Gambia', 'Benin', 'Laos', 'Bangladesh', 'Guinea', 'South Africa', 'Turkey', 'Pakistan', 'Morocco', 'Venezuela', 'Georgia', 'Algeria', 'Ukraine', 'Iraq', 'Gabon', 'Burkina Faso', 'Cambodia', 'Mozambique', 'Nigeria', 'Mali', 'Iran', 'Uganda', 'Liberia', 'Kenya', 'Tunisia', 'Lebanon', 'Namibia', 'Palestinian Territories', 'Myanmar', 'Jordan', 'Chad', 'Sri Lanka', 'Swaziland', 'Comoros', 'Egypt', 'Ethiopia', 'Mauritania', 'Madagascar', 'Togo', 'Zambia', 'Sierra Leone', 'India', 'Burundi', 'Yemen', 'Tanzania', 'Haiti', 'Malawi', 'Lesotho', 'Botswana', 'Rwanda', 'Zimbabwe', 'Afghanistan', 'Finland', 'Denmark', 'Switzerland', 'Iceland', 'Netherlands', 'Norway', 'Sweden', 'Luxembourg', 'New Zealand', 'Austria', 'Australia', 'Israel', 'Germany', 'Canada', 'Ireland', 'Costa Rica', 'United Kingdom', 'Czech Republic', 'United States', 'Belgium', 'France', 'Bahrain', 'Malta', 'Taiwan Province of China', 'United Arab Emirates', 'Saudi Arabia', 'Spain', 'Italy', 'Slovenia', 'Guatemala', 'Uruguay', 'Singapore', 'Kosovo', 'Slovakia', 'Brazil', 'Mexico', 'Jamaica', 'Lithuania', 'Cyprus', 'Estonia', 'Panama', 'Uzbekistan', 'Chile', 'Poland', 'Kazakhstan', 'Romania', 'Kuwait', 'Serbia', 'El Salvador', 'Mauritius', 'Latvia', 'Colombia', 'Hungary', 'Thailand', 'Nicaragua', 'Japan', 'Argentina', 'Portugal', 'Honduras', 'Croatia', 'Philippines', 'South Korea', 'Peru', 'Bosnia and Herzegovina', 'Moldova', 'Ecuador', 'Kyrgyzstan', 'Greece', 'Bolivia', 'Mongolia', 'Paraguay', 'Montenegro', 'Dominican Republic', 'North Cyprus', 'Belarus', 'Russia', 'Hong Kong S.A.R. of China', 'Tajikistan', 'Vietnam', 'Libya', 'Malaysia', 'Indonesia', 'Congo (Brazzaville)', 'China', 'Ivory Coast', 'Armenia', 'Nepal', 'Bulgaria', 'Maldives', 'Azerbaijan', 'Cameroon', 'Senegal', 'Albania', 'North Macedonia', 'Ghana', 'Niger', 'Turkmenistan', 'Gambia', 'Benin', 'Laos', 'Bangladesh', 'Guinea', 'South Africa', 'Turkey', 'Pakistan', 'Morocco', 'Venezuela', 'Georgia', 'Algeria', 'Ukraine', 'Iraq', 'Gabon', 'Burkina Faso', 'Cambodia', 'Mozambique', 'Nigeria', 'Mali', 'Iran', 'Uganda', 'Liberia', 'Kenya', 'Tunisia', 'Lebanon', 'Namibia', 'Palestinian Territories', 'Myanmar', 'Jordan', 'Chad', 'Sri Lanka', 'Swaziland', 'Comoros', 'Egypt', 'Ethiopia', 'Mauritania', 'Madagascar', 'Togo', 'Zambia', 'Sierra Leone', 'India', 'Burundi', 'Yemen', 'Tanzania', 'Haiti', 'Malawi', 'Lesotho', 'Botswana', 'Rwanda', 'Zimbabwe', 'Afghanistan']
 app.layout = html.Div([
-    html.H1("World Happiness Report Data Visulization from 2015 to 2021", style={'text-align': 'center','background-color':'#4797c6','color':'white'}),
+    html.H1("World Happiness Report Data Visualization from 2015 to 2021", style={'text-align': 'center','background-color':'#4797c6','color':'white'}),
     html.Div(id='output_container', children=[]),
     dcc.Slider(
         id="select_year",
@@ -35,6 +34,26 @@ app.layout = html.Div([
         marks={i: 'Year {}'.format(i) for i in range(2015,2022,1)},
         value=2015,
     ),
+    html.Div([
+        dcc.Dropdown(
+            options=[
+                {'label': 'Total Countries', 'value': 'Total Countries'},
+                {'label': 'Commonwealth of Independent States', 'value': 'Commonwealth of Independent States'},
+                {'label': 'Southeast Asia', 'value': 'Southeast Asia'},
+                {'label': 'Middle East and North Africa', 'value': 'Middle East and North Africa'},
+                {'label': 'Western Europe', 'value': 'Western Europe'},
+                {'label': 'Latin America and Caribbean', 'value': 'Latin America and Caribbean'},
+                {'label': 'North America and ANZ', 'value': 'North America and ANZ'},
+                {'label': 'Sub-Saharan Africa', 'value': 'Sub-Saharan Africa'},
+                {'label': 'East Asia', 'value': 'East Asia'},
+                {'label': 'South Asia', 'value': 'South Asia'},
+            ],
+            value='Middle East and North Africa',
+            placeholder="select a factor",
+            id="select_region",
+            style={'float': 'right', 'width': '45%'}
+        ),
+    ]),
     html.Div(
         [    dcc.Graph(id='world_map_happiness', style={'width':'55%','float':'left'}),
             dcc.Graph(id='country_top_ten', style={'width':'45%','float':'left'})]
@@ -43,7 +62,7 @@ app.layout = html.Div([
         dcc.RadioItems(
             options=[
                 {'label': 'Region', 'value': 'Region'},
-                {'label': 'Economy', 'value': 'Economy'},
+                {'label': 'Country category', 'value': 'Economy'},
             ],
             value='Region',
             id="select_region_economy",
@@ -61,7 +80,7 @@ app.layout = html.Div([
             value='Economy (GDP per Capita)',
             placeholder="select a factor",
             id="select_factor",
-            style={'float': 'right','width':'60%','margin-right':'10%'}
+            style={'float': 'right','width':'60%','margin-right':'5%'}
         ),
     ]),
     html.Div([
@@ -84,7 +103,6 @@ app.layout = html.Div([
     html.Div(
         [dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
          dcc.Graph(id='all_country_compare_rank', style={'width': '45%','float': 'left'})],
-
     ),
 
 ])
@@ -106,11 +124,8 @@ def getValue(year, way):
 
     if way == 'Region':
         for index, country in countries.iterrows():
-            print(country['Region'])
             values[dict.get(country['Region'])] += 1
     return values
-
-
 
 @app.callback(
     Output(component_id='dot_factor_graph', component_property='figure'),
@@ -120,8 +135,6 @@ def getValue(year, way):
     ]
 )
 def getFactorInfluence(year, factor):
-    print(year)
-    print(factor)
     fileName = "2021.csv"
     countries = pd.read_csv(fileName)
     factorScore = []
@@ -180,7 +193,6 @@ def allCountryCompare(choseCountries):
             for index, data in file.iterrows():
                 if data["Country"] == country:
                     happiness_score.append(data["Happiness Score"])
-                    print(happiness_score)
                     break
         scoreFig.add_trace(go.Scatter(
             x=years,
@@ -210,8 +222,6 @@ def allCountryCompare(choseCountries):
                 marker_size=[np.exp(int(happiness_score[i]))/10 for i in range(len(happiness_score))],
                 name=country
             ))
-        print([j for i in range(len(happiness_score))])
-        print([int(happiness_score[i]*3) for i in range(len(happiness_score))])
     rankFig = go.Figure(data=points)
     scoreFig.update_layout(title_text="Countries score change from 2015 to 2021")
     rankFig.update_layout(title_text="Countries rank change from 2015 to 2021")
@@ -224,9 +234,10 @@ def allCountryCompare(choseCountries):
         Output(component_id='world_map_happiness', component_property="figure"),
         Output(component_id='country_top_ten', component_property="figure"),
     ],
-    [Input(component_id='select_year', component_property='value')]
+    [Input(component_id='select_year', component_property='value'),
+     Input(component_id='select_region', component_property='value')]
 )
-def yearCompare(year):
+def yearCompare(year, region):
     container = "The year chosen by user is: {}".format(year)
     #fileName = str(year)+".csv"
     fileName = "2021.csv"
@@ -250,17 +261,9 @@ def yearCompare(year):
             showframe=False,
             showcoastlines=False,
             projection_type='equirectangular'
-        ),
-        annotations=[dict(
-            x=0.55,
-            y=0.1,
-            xref='paper',
-            yref='paper',
-            showarrow=False
-        )]
+        )
     )
-
-    top10CountryName = []
+    regionBar = []
     economy = []
     social_support = []
     health = []
@@ -268,31 +271,50 @@ def yearCompare(year):
     generosity = []
     trust = []
     dystopia_residual = []
-    countries = pd.read_csv("2021.csv", nrows=10)
-    for index, country in countries.iterrows():
-        top10CountryName.append(country["Country"])
-        economy.append(country["Economy (GDP per Capita)"])
-        social_support.append(country["Social support"])
-        health.append(country["Health (Life Expectancy)"])
-        freedom.append(country["Freedom"])
-        generosity.append(country["Generosity"])
-        trust.append(country["Trust (Government Corruption)"])
-        dystopia_residual.append(country["Dystopia Residual"])
-
-
-    top10BarChart = go.Figure(data=[
-        go.Bar(name='Economy (GDP per Capita)', x=top10CountryName, y=economy),
-        go.Bar(name='Social support', x=top10CountryName, y=social_support),
-        go.Bar(name='Health (Life Expectancy)', x=top10CountryName, y=health),
-        go.Bar(name='Freedom to make life choice', x=top10CountryName, y=freedom),
-        go.Bar(name='Generosity', x=top10CountryName, y=generosity),
-        go.Bar(name='Trust (Government Corruption)', x=top10CountryName, y=trust),
-        go.Bar(name='Dystopia Residual', x=top10CountryName, y=dystopia_residual)
+    countryName = []
+    print(region)
+    if region == 'Total Countries':
+        print("Yes")
+        countries = pd.read_csv("2021.csv", nrows=10)
+        for index, country in countries.iterrows():
+            countryName.append(country["Country"])
+            economy.append(country["Economy (GDP per Capita)"])
+            social_support.append(country["Social support"])
+            health.append(country["Health (Life Expectancy)"])
+            freedom.append(country["Freedom"])
+            generosity.append(country["Generosity"])
+            trust.append(country["Trust (Government Corruption)"])
+            dystopia_residual.append(country["Dystopia Residual"])
+    else:
+        countries = pd.read_csv("2021.csv")
+        for index, country in countries.iterrows():
+            if country["Region"] == region:
+                countryName.append(country["Country"])
+                economy.append(country["Economy (GDP per Capita)"])
+                social_support.append(country["Social support"])
+                health.append(country["Health (Life Expectancy)"])
+                freedom.append(country["Freedom"])
+                generosity.append(country["Generosity"])
+                trust.append(country["Trust (Government Corruption)"])
+                dystopia_residual.append(country["Dystopia Residual"])
+    regionBar = go.Figure(data=[
+        go.Bar(name='Economy (GDP per Capita)', y=countryName, x=economy,orientation='h'),
+        go.Bar(name='Social support', y=countryName, x=social_support,orientation='h'),
+        go.Bar(name='Health (Life Expectancy)', y=countryName, x=health,orientation='h'),
+        go.Bar(name='Freedom to make life choice', y=countryName, x=freedom,orientation='h'),
+        go.Bar(name='Generosity', y=countryName, x=generosity,orientation='h'),
+        go.Bar(name='Trust (Government Corruption)', y=countryName, x=trust,orientation='h'),
+        go.Bar(name='Dystopia Residual', y=countryName, x=dystopia_residual,orientation='h')
     ])
-    top10BarChart.update_layout(barmode='stack')
-    title = "The top 10 happiest countries in {0}".format(year)
-    top10BarChart.update_layout(title_text=title)
-    return container, fig, top10BarChart
+
+    regionBar.update_layout(barmode='stack')
+    if region == 'Total Countries':
+        title = "The top 10 happiest countries in {0}".format(year)
+    else:
+        title = "The happiness rank in {0} in {1}".format(region, year)
+    regionBar.update_layout(title_text=title)
+
+    return container, fig, regionBar
 
 
 
