@@ -272,9 +272,7 @@ def yearCompare(year, region):
     trust = []
     dystopia_residual = []
     countryName = []
-    print(region)
     if region == 'Total Countries':
-        print("Yes")
         countries = pd.read_csv("2021.csv", nrows=10)
         for index, country in countries.iterrows():
             countryName.append(country["Country"])
