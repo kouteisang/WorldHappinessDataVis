@@ -27,6 +27,7 @@ all_country_option = ['Finland', 'Denmark', 'Switzerland', 'Iceland', 'Netherlan
 app.layout = html.Div([
     html.H1("World Happiness Report Data Visualization from 2015 to 2021", style={'text-align': 'center','background-color':'#4797c6','color':'white'}),
     html.Div(id='output_container', children=[]),
+    # initial select year
     dcc.Slider(
         id="select_year",
         min=2015,
@@ -34,7 +35,14 @@ app.layout = html.Div([
         marks={i: 'Year {}'.format(i) for i in range(2015,2022,1)},
         value=2015,
     ),
+    # initial world happiness map
+    html.Div(
+        [    dcc.Graph(id='world_map_happiness', style={'width':'100%'}),
+        ]
+    ),
+    #initail select region dropdown
     html.Div([
+        #select area
         dcc.Dropdown(
             options=[
                 {'label': 'Total Countries', 'value': 'Total Countries'},
@@ -51,14 +59,9 @@ app.layout = html.Div([
             value='Middle East and North Africa',
             placeholder="select a factor",
             id="select_region",
-            style={'float': 'right', 'width': '45%'}
+            style={'width': '40%', 'float':'left'}
         ),
-    ]),
-    html.Div(
-        [    dcc.Graph(id='world_map_happiness', style={'width':'55%','float':'left'}),
-            dcc.Graph(id='country_top_ten', style={'width':'45%','float':'left'})]
-    ),
-    html.Div([
+        #select compare
         dcc.RadioItems(
             options=[
                 {'label': 'Region', 'value': 'Region'},
@@ -66,8 +69,9 @@ app.layout = html.Div([
             ],
             value='Region',
             id="select_region_economy",
-            style={'float':'left'}
+            style={'width': '20%', 'float':'left','margin-left':'10px'}
         ),
+        #select relationship dropdown
         dcc.Dropdown(
             options=[
                 {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
@@ -80,12 +84,14 @@ app.layout = html.Div([
             value='Economy (GDP per Capita)',
             placeholder="select a factor",
             id="select_factor",
-            style={'float': 'right','width':'60%','margin-right':'5%'}
+            style={'width': '40%', 'float':'right', 'margin-right':'100px'}
         ),
-    ]),
-    html.Div([
-        dcc.Graph(id='pie_region_economy', style={'width': '40%', 'float': 'left'}),
-        dcc.Graph(id='dot_factor_graph', style = {'width':'60%', 'float':'right'})
+    ],style={'margin-top':'50px'},),
+    html.Div(
+        [
+            dcc.Graph(id='country_top_ten', style={'width': '33%', 'float':'left'}),
+            dcc.Graph(id='radar_region_economy', style={'width': '33%', 'float': 'left'}),
+            dcc.Graph(id='dot_factor_graph', style={'width': '33%', 'float': 'right'})
         ]
     ),
     html.Div([
@@ -104,13 +110,13 @@ app.layout = html.Div([
         [dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
          dcc.Graph(id='all_country_compare_rank', style={'width': '45%','float': 'left'})],
     ),
-
 ])
 
 #remember to change in the future
 def getValue(year, way):
-    countries = pd.read_csv("2021.csv", nrows=50)
+    countries = pd.read_csv("2021.csv")
     values = [0] * 10
+    num = [0] * 10
     dict = {'Central and Eastern Europe':0,
             'Commonwealth of Independent States':1,
             'Southeast Asia':2,
@@ -121,10 +127,18 @@ def getValue(year, way):
             'Sub-Saharan Africa':7,
             'East Asia':8,
             'South Asia':9}
-
     if way == 'Region':
         for index, country in countries.iterrows():
-            values[dict.get(country['Region'])] += 1
+            values[dict.get(country['Region'])] += float(country['Happiness Score'])
+            num[dict.get(country['Region'])] += 1
+    print(num)
+    for i in range(len(values)):
+        print(values[i])
+        print("num[i]=",num[i])
+        if num[i] == 0:
+            values[i] = 0
+        else:
+            values[i] = values[i]*1.0/num[i]
     return values
 
 @app.callback(
@@ -152,7 +166,7 @@ def getFactorInfluence(year, factor):
 
 
 @app.callback(
-    Output(component_id='pie_region_economy', component_property='figure'),
+    Output(component_id='radar_region_economy', component_property='figure'),
     [
         Input(component_id='select_year', component_property= 'value'),
         Input(component_id='select_region_economy', component_property= 'value')
@@ -171,7 +185,22 @@ def percentRegionEconomy(year, way):
               'South Asia']
 
     values = getValue(year, way)
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    print(values)
+    fig = go.Figure(data=go.Scatterpolar(
+        r=values,
+        theta=labels,
+        fill='toself'
+    ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True
+            ),
+        ),
+        showlegend=False,
+        title_text="The Happiness Average Score in Region"
+    )
     return fig
 
 #input : country be chosen
@@ -254,6 +283,7 @@ def yearCompare(year, region):
         marker_line_width=0.5,
         colorbar_title='Total score',
     ))
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     world_title = "{0} World Happiness map".format(year)
     fig.update_layout(
         title_text=world_title,
