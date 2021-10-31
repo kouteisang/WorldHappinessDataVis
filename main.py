@@ -40,7 +40,7 @@ app.layout = html.Div([
         [    dcc.Graph(id='world_map_happiness', style={'width':'100%'}),
         ]
     ),
-    #initail select region dropdown
+    #initial select region dropdown
     html.Div([
         #select area
         dcc.Dropdown(
@@ -87,11 +87,18 @@ app.layout = html.Div([
             style={'width': '40%', 'float':'right', 'margin-right':'100px'}
         ),
     ],style={'margin-top':'50px'},),
+    #initial stack area chart radar chart scatterplot
     html.Div(
         [
             dcc.Graph(id='country_top_ten', style={'width': '33%', 'float':'left'}),
             dcc.Graph(id='radar_region_economy', style={'width': '33%', 'float': 'left'}),
             dcc.Graph(id='dot_factor_graph', style={'width': '33%', 'float': 'right'})
+        ],style={'height':'450px'}
+    ),
+    #initial parallel plot
+    html.Div(
+        [
+            dcc.Graph(id='factor_parallel_plot',style={'width':'100%', 'height':'500px'}),
         ]
     ),
     html.Div([
@@ -131,10 +138,7 @@ def getValue(year, way):
         for index, country in countries.iterrows():
             values[dict.get(country['Region'])] += float(country['Happiness Score'])
             num[dict.get(country['Region'])] += 1
-    print(num)
     for i in range(len(values)):
-        print(values[i])
-        print("num[i]=",num[i])
         if num[i] == 0:
             values[i] = 0
         else:
@@ -185,7 +189,6 @@ def percentRegionEconomy(year, way):
               'South Asia']
 
     values = getValue(year, way)
-    print(values)
     fig = go.Figure(data=go.Scatterpolar(
         r=values,
         theta=labels,
@@ -345,8 +348,41 @@ def yearCompare(year, region):
     return container, fig, regionBar
 
 
+#initial parallel data
+#remember if only one output never use []
+@app.callback(
+    Output(component_id='factor_parallel_plot', component_property='figure'),
+    [
+        Input(component_id='select_year', component_property='value')
+    ]
+)
+def getParallelData(year):
+    print(year)
+    df = pd.read_csv("2021.csv")
+    fig = go.Figure(data=
+    go.Parcoords(
+        dimensions=list([
+            dict(range=[3, 8],
+                 label='Happiness Score', values=df['Happiness Score']),
+            dict(range=[0, 2],
+                 label='Economy (GDP per Capita)', values=df['Economy (GDP per Capita)']),
+            dict(range=[0, 1],
+                 label='Health (Life Expectancy)', values=df['Health (Life Expectancy)']),
+            dict(range=[0, 1],
+                 label='Freedom', values=df['Freedom']),
+            dict(range=[0, 1],
+                 label='Generosity', values=df['Generosity']),
+            dict(range=[0, 1],
+                 label='Trust (Government Corruption)', values=df['Trust (Government Corruption)'])
+        ])
+    )
+    )
 
-
+    fig.update_layout(
+        plot_bgcolor='white',
+        paper_bgcolor='white'
+    )
+    return fig
 
 
 if __name__ == '__main__':
