@@ -12,6 +12,6 @@ for index, data in file.iterrows():
     worldCloudText += ' '
     worldCloudText += str(data["Country"] )
 
-w = wordcloud.WordCloud(background_color='white', width=2000, height=200)
+w = wordcloud.WordCloud(background_color='white', width=2000, height=150)
 w.generate(worldCloudText)
 w.to_file('assets/allCountries1.png')
