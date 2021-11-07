@@ -109,17 +109,33 @@ app.layout = html.Div([
             ],
             value=['Denmark'],
             multi=True,
-            style={'padding-left':'1%','width':'65%'},
+            style={'padding-left':'1%','width':'65%', 'float':'left'},
             placeholder="Select a Country or Region to see the change of the rank of happiness during 2015-2021",
             id='select_country',
+        ),
+        dcc.Dropdown(
+            options=[
+                {'label': k, 'value': k} for k in all_country_option
+            ],
+         #   style={'width': '60%', 'float': 'right', 'margin-right':'10%'},
+            style={'width':'50%', 'float':'left','margin-top':'-18px', 'margin-left':'33%'},
+            placeholder="Select a Country or Region to see the change of different factors during 2015-2021",
+            id='select_factor_by_country',
+            searchable=True
         )
     ]),
     html.Div([
         dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
-        html.Img(
-            src=app.get_asset_url('allCountries.png')
-        )]
+        dcc.Graph(id='factors_country', style={'width': '45%', 'float': 'left', 'margin-left':'10px'})
+      ]
     ),
+    html.Div(
+        [
+            html.Img(
+                src=app.get_asset_url('allCountries1.png')
+            )
+        ], style={'width':'100%'}
+    )
 ])
 
 #remember to change in the future
@@ -392,6 +408,75 @@ def getParallelData(year):
         paper_bgcolor='white'
     )
     return fig
+
+
+@app.callback(
+    Output(component_id='factors_country', component_property='figure'),
+    [
+        Input(component_id='select_factor_by_country', component_property='value')
+    ]
+)
+def select_country_by_factor(country):
+    factorFig = go.Figure()
+    print(country)
+    years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    happiness_score = []
+    economy = []
+    social = []
+    health = []
+    Freedom = []
+    Generosity = []
+    Trust = []
+    for year in years:
+        file = pd.read_csv(str(year)+".csv")
+        for index, data in file.iterrows():
+            if data["Country"] == country:
+                happiness_score.append(data["Happiness Score"])
+                economy.append(data['Economy (GDP per Capita)'])
+                social.append(data['Social support'])
+                health.append(data['Health (Life Expectancy)'])
+                Freedom.append(data['Freedom'])
+                Generosity.append(data['Generosity'])
+                Trust.append(data['Trust (Government Corruption)'])
+                break
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=economy,
+        name="Economy (GDP per Capita)",
+        connectgaps=True
+    ))
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=social,
+        name="Social support",
+        connectgaps=True
+    ))
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=health,
+        name="Health (Life Expectancy)",
+        connectgaps=True
+    ))
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=Freedom,
+        name="Freedeom to make life choice",
+        connectgaps=True
+    ))
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=Generosity,
+        name="Generosity",
+        connectgaps=True
+    ))
+    factorFig.add_trace(go.Scatter(
+        x=years,
+        y=Trust,
+        name="Government Corruption",
+        connectgaps=True
+    ))
+    factorFig.update_layout(title_text="Happiness factor change from 2015 to 2021")
+    return factorFig
 
 
 if __name__ == '__main__':

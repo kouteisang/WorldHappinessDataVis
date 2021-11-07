@@ -7,9 +7,11 @@ years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
 worldCloudText = ''
 
 file = pd.read_csv(str(2021) + ".csv")
+worldCloudText += " WorldHappinessReportFrom2015-2021"
 for index, data in file.iterrows():
     worldCloudText += ' '
     worldCloudText += str(data["Country"] )
-w = wordcloud.WordCloud(background_color='white', width=1000, height=400)
+
+w = wordcloud.WordCloud(background_color='white', width=2000, height=200)
 w.generate(worldCloudText)
-w.to_file('assets/allCountries.png')
+w.to_file('assets/allCountries1.png')
