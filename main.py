@@ -8,6 +8,7 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import wordcloud
 import statsmodels
 
 #add external stylesheet
@@ -112,10 +113,12 @@ app.layout = html.Div([
             placeholder="Select a Country or Region to see the change of the rank of happiness during 2015-2021",
             id='select_country',
         )
-    ], style={'padding-top':'10%'}),
-    html.Div(
-        [dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
-         dcc.Graph(id='all_country_compare_rank', style={'width': '45%','float': 'left'})],
+    ]),
+    html.Div([
+        dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
+        html.Img(
+            src=app.get_asset_url('allCountries.png')
+        )]
     ),
 ])
 
@@ -209,12 +212,13 @@ def percentRegionEconomy(year, way):
 #input : country be chosen
 #output:countries score during 2015-2021 lien chart
 @app.callback(
-    [   Output(component_id='all_country_compare_score', component_property='figure'),
-        Output(component_id='all_country_compare_rank', component_property='figure'),
-    ],
+       Output(component_id='all_country_compare_score', component_property='figure'),
+        # Output(component_id='all_country_compare_rank', component_property='figure'),
+
     [Input(component_id='select_country', component_property='value')]
 )
 def allCountryCompare(choseCountries):
+    worldCloudText = ''
     scoreFig = go.Figure()
     rankFig = go.Figure()
     years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
@@ -245,6 +249,11 @@ def allCountryCompare(choseCountries):
                 if data["Country"] == country:
                     happiness_score.append(data["Happiness Score"])
                     happiness_rank.append(data["Happiness Rank"])
+                    worldCloudText += ' '
+                    worldCloudText += str(year)
+                    worldCloudText += country
+                    worldCloudText += 'RANK'
+                    worldCloudText += str(data["Happiness Rank"])
                     break
         j += 1
         j*= 10
@@ -257,7 +266,7 @@ def allCountryCompare(choseCountries):
     rankFig = go.Figure(data=points)
     scoreFig.update_layout(title_text="Countries score change from 2015 to 2021")
     rankFig.update_layout(title_text="Countries rank change from 2015 to 2021")
-    return scoreFig, rankFig
+    return scoreFig
 
 
 @app.callback(
@@ -386,4 +395,4 @@ def getParallelData(year):
 
 
 if __name__ == '__main__':
-    app.run_server(host="0.0.0.0", port="8080", debug=True)
+    app.run_server(host="0.0.0.0", port="8081", debug=True)
