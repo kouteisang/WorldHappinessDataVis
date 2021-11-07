@@ -7,6 +7,7 @@ RUN pip3 install dash-html-components
 RUN pip3 install dash-core-components
 RUN pip3 install dash-table
 RUN pip3 install statsmodels
+RUN pip3 install worldcloud
 
 COPY . .
 EXPOSE 8080
