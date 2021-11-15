@@ -140,7 +140,7 @@ app.layout = html.Div([
 
 #remember to change in the future
 def getValue(year, way):
-    countries = pd.read_csv("2021.csv")
+    countries = pd.read_csv("2021_new.csv")
     values = [0] * 10
     num = [0] * 10
     dict = {'Central and Eastern Europe':0,
@@ -153,10 +153,19 @@ def getValue(year, way):
             'Sub-Saharan Africa':7,
             'East Asia':8,
             'South Asia':9}
+    dict_value = {
+        'developed':0,
+        'developing':1,
+        'least':2
+    }
     if way == 'Region':
         for index, country in countries.iterrows():
             values[dict.get(country['Region'])] += float(country['Happiness Score'])
             num[dict.get(country['Region'])] += 1
+    elif way == 'Economy':
+        for index, country in countries.iterrows():
+            values[dict_value.get(country['TYPE'])] += float(country['Happiness Score'])
+            num[dict_value.get(country['TYPE'])] += 1
     for i in range(len(values)):
         if num[i] == 0:
             values[i] = 0
@@ -172,7 +181,7 @@ def getValue(year, way):
     ]
 )
 def getFactorInfluence(year, factor):
-    fileName = "2021.csv"
+    fileName = "2021_new.csv"
     countries = pd.read_csv(fileName)
     factorScore = []
     totalScore = []
@@ -206,14 +215,25 @@ def percentRegionEconomy(year, way):
               'Sub-Saharan Africa',
               'East Asia',
               'South Asia']
+    label_economy = [
+        'Developed Country',
+        'Developing Country',
+        'Least Developed Country'
+    ]
 
     values = getValue(year, way)
-    fig = go.Figure(data=go.Scatterpolar(
-        r=values,
-        theta=labels,
-        fill='toself'
-    ))
-
+    if way == 'Region':
+        fig = go.Figure(data=go.Scatterpolar(
+            r=values,
+            theta=labels,
+            fill='toself'
+        ))
+    elif way == 'Economy':
+        fig = go.Figure(data=go.Scatterpolar(
+            r=values,
+            theta=label_economy,
+            fill='toself'
+        ))
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
@@ -297,7 +317,7 @@ def allCountryCompare(choseCountries):
 def yearCompare(year, region):
     container = "The year chosen by user is: {}".format(year)
     #fileName = str(year)+".csv"
-    fileName = "2021.csv"
+    fileName = "2021_new.csv"
     #Get all countries name
     countryMap = pd.read_csv(fileName)
     fig = go.Figure(data=go.Choropleth(
@@ -331,7 +351,7 @@ def yearCompare(year, region):
     dystopia_residual = []
     countryName = []
     if region == 'Total Countries':
-        countries = pd.read_csv("2021.csv", nrows=10)
+        countries = pd.read_csv("2021_new.csv", nrows=10)
         for index, country in countries.iterrows():
             countryName.append(country["Country"])
             economy.append(country["Economy (GDP per Capita)"])
@@ -342,7 +362,7 @@ def yearCompare(year, region):
             trust.append(country["Trust (Government Corruption)"])
             dystopia_residual.append(country["Dystopia Residual"])
     else:
-        countries = pd.read_csv("2021.csv")
+        countries = pd.read_csv("2021_new.csv")
         for index, country in countries.iterrows():
             if country["Region"] == region:
                 countryName.append(country["Country"])
@@ -383,7 +403,7 @@ def yearCompare(year, region):
 )
 def getParallelData(year):
     print(year)
-    df = pd.read_csv("2021.csv")
+    df = pd.read_csv("2021_new.csv")
     fig = go.Figure(data=
     go.Parcoords(
         dimensions=list([
