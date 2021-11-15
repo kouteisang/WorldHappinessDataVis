@@ -140,7 +140,8 @@ app.layout = html.Div([
 
 #remember to change in the future
 def getValue(year, way):
-    countries = pd.read_csv("2021_new.csv")
+    file = str(year) + "_new3.csv"
+    countries = pd.read_csv(file)
     values = [0] * 10
     num = [0] * 10
     dict = {'Central and Eastern Europe':0,
@@ -181,8 +182,8 @@ def getValue(year, way):
     ]
 )
 def getFactorInfluence(year, factor):
-    fileName = "2021_new.csv"
-    countries = pd.read_csv(fileName)
+    file = str(year) + "_new3.csv"
+    countries = pd.read_csv(file)
     factorScore = []
     totalScore = []
     countryName = []
@@ -261,7 +262,7 @@ def allCountryCompare(choseCountries):
     for country in choseCountries:
         happiness_score = []
         for year in years:
-            file = pd.read_csv(str(year)+".csv")
+            file = pd.read_csv(str(year)+"_new3.csv")
             for index, data in file.iterrows():
                 if data["Country"] == country:
                     happiness_score.append(data["Happiness Score"])
@@ -280,7 +281,7 @@ def allCountryCompare(choseCountries):
         happiness_score = []
         happiness_rank = []
         for year in years:
-            file = pd.read_csv(str(year) + ".csv")
+            file = pd.read_csv(str(year) + "_new3.csv")
             for index, data in file.iterrows():
                 if data["Country"] == country:
                     happiness_score.append(data["Happiness Score"])
@@ -317,9 +318,9 @@ def allCountryCompare(choseCountries):
 def yearCompare(year, region):
     container = "The year chosen by user is: {}".format(year)
     #fileName = str(year)+".csv"
-    fileName = "2021_new.csv"
+    file = str(year) + "_new3.csv"
     #Get all countries name
-    countryMap = pd.read_csv(fileName)
+    countryMap = pd.read_csv(file)
     fig = go.Figure(data=go.Choropleth(
         locations=countryMap['CODE'],
         z=countryMap['Happiness Score'],
@@ -351,7 +352,7 @@ def yearCompare(year, region):
     dystopia_residual = []
     countryName = []
     if region == 'Total Countries':
-        countries = pd.read_csv("2021_new.csv", nrows=10)
+        countries = pd.read_csv(file, nrows=10)
         for index, country in countries.iterrows():
             countryName.append(country["Country"])
             economy.append(country["Economy (GDP per Capita)"])
@@ -362,7 +363,7 @@ def yearCompare(year, region):
             trust.append(country["Trust (Government Corruption)"])
             dystopia_residual.append(country["Dystopia Residual"])
     else:
-        countries = pd.read_csv("2021_new.csv")
+        countries = pd.read_csv(file)
         for index, country in countries.iterrows():
             if country["Region"] == region:
                 countryName.append(country["Country"])
@@ -402,8 +403,8 @@ def yearCompare(year, region):
     ]
 )
 def getParallelData(year):
-    print(year)
-    df = pd.read_csv("2021_new.csv")
+    file = str(year) + "_new3.csv"
+    df = pd.read_csv(file)
     fig = go.Figure(data=
     go.Parcoords(
         dimensions=list([
@@ -438,7 +439,6 @@ def getParallelData(year):
 )
 def select_country_by_factor(country):
     factorFig = go.Figure()
-    print(country)
     years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
     happiness_score = []
     economy = []
@@ -448,7 +448,7 @@ def select_country_by_factor(country):
     Generosity = []
     Trust = []
     for year in years:
-        file = pd.read_csv(str(year)+".csv")
+        file = pd.read_csv(str(year)+"_new3.csv")
         for index, data in file.iterrows():
             if data["Country"] == country:
                 happiness_score.append(data["Happiness Score"])
