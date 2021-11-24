@@ -1,3 +1,4 @@
+import json
 import math
 import random
 import numpy as np
@@ -40,6 +41,12 @@ app.layout = html.Div([
     html.Div(
         [    dcc.Graph(id='world_map_happiness', style={'width':'100%'}),
         ]
+    ),
+    html.Div(
+        [
+            dcc.Graph(id='factors_country', style={'width': '63%', 'height':'370px', 'float':'left'}),
+            dcc.Graph(id='figTotal', style={'width': '36%', 'height': '370px', 'float':'left'})
+        ],style={'height':'370px'}
     ),
     #initial select region dropdown
     html.Div([
@@ -113,20 +120,20 @@ app.layout = html.Div([
             placeholder="Select a Country or Region to see the change of the rank of happiness during 2015-2021",
             id='select_country',
         ),
-        dcc.Dropdown(
-            options=[
-                {'label': k, 'value': k} for k in all_country_option
-            ],
-         #   style={'width': '60%', 'float': 'right', 'margin-right':'10%'},
-            style={'width':'50%', 'float':'left','margin-top':'-18px', 'margin-left':'33%'},
-            placeholder="Select a Country or Region to see the change of different factors during 2015-2021",
-            id='select_factor_by_country',
-            searchable=True
-        )
+        # dcc.Dropdown(
+        #     options=[
+        #         {'label': k, 'value': k} for k in all_country_option
+        #     ],
+        #  #   style={'width': '60%', 'float': 'right', 'margin-right':'10%'},
+        #     style={'width':'50%', 'float':'left','margin-top':'-18px', 'margin-left':'33%'},
+        #     placeholder="Select a Country or Region to see the change of different factors during 2015-2021",
+        #     id='select_factor_by_country',
+        #     searchable=True
+        # )
     ]),
     html.Div([
         dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
-        dcc.Graph(id='factors_country', style={'width': '45%', 'float': 'left', 'margin-left':'10px'})
+        # dcc.Graph(id='factors_country', style={'width': '45%', 'float': 'left', 'margin-left':'10px'})
       ]
     ),
     html.Div(
@@ -195,6 +202,7 @@ def getFactorInfluence(year, factor):
     df[factor]=factorScore
     df["Total Score"] = totalScore
     fig = px.scatter(df, x=factor, y="Total Score", trendline="ols", hover_name=countryName)
+    fig.update_layout(plot_bgcolor="white")
     return fig
 
 
@@ -430,14 +438,85 @@ def getParallelData(year):
     )
     return fig
 
+#
+# @app.callback(
+#     Output(component_id='factors_country', component_property='figure'),
+#     [
+#         Input(component_id='select_factor_by_country', component_property='value')
+#     ]
+# )
+# def select_country_by_factor(country):
+#     factorFig = go.Figure()
+#     years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
+#     happiness_score = []
+#     economy = []
+#     social = []
+#     health = []
+#     Freedom = []
+#     Generosity = []
+#     Trust = []
+#     for year in years:
+#         file = pd.read_csv(str(year)+"_new3.csv")
+#         for index, data in file.iterrows():
+#             if data["Country"] == country:
+#                 happiness_score.append(data["Happiness Score"])
+#                 economy.append(data['Economy (GDP per Capita)'])
+#                 social.append(data['Social support'])
+#                 health.append(data['Health (Life Expectancy)'])
+#                 Freedom.append(data['Freedom'])
+#                 Generosity.append(data['Generosity'])
+#                 Trust.append(data['Trust (Government Corruption)'])
+#                 break
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=economy,
+#         name="Economy (GDP per Capita)",
+#         connectgaps=True
+#     ))
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=social,
+#         name="Social support",
+#         connectgaps=True
+#     ))
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=health,
+#         name="Health (Life Expectancy)",
+#         connectgaps=True
+#     ))
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=Freedom,
+#         name="Freedeom to make life choice",
+#         connectgaps=True
+#     ))
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=Generosity,
+#         name="Generosity",
+#         connectgaps=True
+#     ))
+#     factorFig.add_trace(go.Scatter(
+#         x=years,
+#         y=Trust,
+#         name="Government Corruption",
+#         connectgaps=True
+#     ))
+#     factorFig.update_layout(title_text="Happiness factor change from 2015 to 2021")
+#     return factorFig
+
 
 @app.callback(
-    Output(component_id='factors_country', component_property='figure'),
-    [
-        Input(component_id='select_factor_by_country', component_property='value')
-    ]
+    [Output('factors_country', 'figure'),
+     Output('figTotal', 'figure')
+     ],
+    [Input('world_map_happiness', 'clickData')]
 )
-def select_country_by_factor(country):
+def mapClickEvent(clickData):
+    if clickData == None:
+        clickData ={'points': [{'curveNumber': 0, 'pointNumber': 63, 'pointIndex': 63, 'location': 'RUS', 'z': 5.716, 'text': 'China', 'bbox': {'x0': 1142.0527561417348, 'x1': 1142.0527561417348, 'y0': 219.77328636984856, 'y1': 219.77328636984856}}]}
+    country = clickData['points'][0]['text']
     factorFig = go.Figure()
     years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
     happiness_score = []
@@ -447,8 +526,10 @@ def select_country_by_factor(country):
     Freedom = []
     Generosity = []
     Trust = []
+    HappinessScore = []
+    DystopiaResidual=[]
     for year in years:
-        file = pd.read_csv(str(year)+"_new3.csv")
+        file = pd.read_csv(str(year) + "_new3.csv")
         for index, data in file.iterrows():
             if data["Country"] == country:
                 happiness_score.append(data["Happiness Score"])
@@ -458,7 +539,33 @@ def select_country_by_factor(country):
                 Freedom.append(data['Freedom'])
                 Generosity.append(data['Generosity'])
                 Trust.append(data['Trust (Government Corruption)'])
+                HappinessScore.append(data['Happiness Score'])
+                DystopiaResidual.append(data['Dystopia Residual'])
                 break
+    regionBar = go.Figure(data=[
+        go.Bar(name='Economy (GDP per Capita)', y=economy),
+        go.Bar(name='Social support',  y=social ),
+        go.Bar(name='Health (Life Expectancy)',  y=health, ),
+        go.Bar(name='Freedom to make life choice',  y=Freedom, ),
+        go.Bar(name='Generosity',  y=Generosity),
+        go.Bar(name='Trust (Government Corruption)', y=Trust),
+    ])
+    x=[2015,2016,2017,2018,2019,2020,2021]
+    fig = go.Figure(go.Bar(name='Economy (GDP per Capita)', y=economy, x=x))
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=HappinessScore,
+        name="HappinessScore",
+        connectgaps=True
+    ))
+    fig.add_trace(go.Bar(name='Social support',  y=social,x=x))
+    fig.add_trace( go.Bar(name='Health (Life Expectancy)',  y=health,x=x))
+    fig.add_trace(go.Bar(name='Generosity',  y=Generosity,x=x))
+    fig.add_trace(go.Bar(name='Trust (Government Corruption)', y=Trust,x=x))
+    fig.add_trace(go.Bar(name='Generosity', y=Generosity,x=x))
+    fig.add_trace(go.Bar(name='Dystopia Residual', y=DystopiaResidual, x=x))
+
+    regionBar.update_layout(barmode='stack')
     factorFig.add_trace(go.Scatter(
         x=years,
         y=economy,
@@ -495,8 +602,12 @@ def select_country_by_factor(country):
         name="Government Corruption",
         connectgaps=True
     ))
-    factorFig.update_layout(title_text="Happiness factor change from 2015 to 2021")
-    return factorFig
+    factorFig.update_layout(title_text= country +"'s Happiness Score change from 2015 to 2021",    plot_bgcolor="white")
+    figTotal = go.Figure(data=go.Scatter(x=x, y=HappinessScore, name='Happiness Score'))
+   # fig.update_layout(barmode='stack')
+    figTotal.update_layout( plot_bgcolor="white")
+    return factorFig, figTotal
+
 
 
 if __name__ == '__main__':
