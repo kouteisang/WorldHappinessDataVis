@@ -35,9 +35,9 @@ python3 run main.py
 ```
 
 ## Runtime Screenshot
-![](./images/screenshot1.png)
-![](./images/screenshot2.png)
-![](./images/screenshot3.png)
+![](./images/screenshot1_new.png)
+![](./images/screenshot2_new.png)
+![](./images/screenshot3_new.png)
 
 
 # 世界人民幸福指数可视化项目
