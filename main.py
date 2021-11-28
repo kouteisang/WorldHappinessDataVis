@@ -80,27 +80,16 @@ app.layout = html.Div([
             style={'width': '20%', 'float':'left','margin-left':'10px'}
         ),
         #select relationship dropdown
-        dcc.Dropdown(
-            options=[
-                {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
-                {'label': 'Social support', 'value': 'Social support'},
-                {'label': 'Health (Life Expectancy)', 'value': 'Health (Life Expectancy)'},
-                {'label': 'Freedom to make life choice', 'value': 'Freedom'},
-                {'label': 'Generosity', 'value': 'Generosity'},
-                {'label': 'Trust (Government Corruption)', 'value': 'Trust (Government Corruption)'},
-            ],
-            value='Economy (GDP per Capita)',
-            placeholder="select a factor",
-            id="select_factor",
-            style={'width': '40%', 'float':'right', 'margin-right':'100px'}
-        ),
-    ],style={'margin-top':'50px'},),
+      #cheng
+    ],style={'margin-top':'0px'},),
     #initial stack area chart radar chart scatterplot
     html.Div(
         [
-            dcc.Graph(id='radar_region_economy', style={'width': '55%', 'float': 'left'}),
+            dcc.Graph(id='radar_region_economy', style={'width': '55%', 'float': 'left', }),
             dcc.Graph(id='country_top_ten', style={'width': '45%', 'float':'left'}),
-        ],style={'height':'450px'}
+            #, 'margin-top':'-400px'
+            #'margin-left':'-380px'
+        ],style={'height':'450px','margin-top':'25px'}
     ),
     #initial parallel plot
     html.Div(
@@ -129,6 +118,22 @@ app.layout = html.Div([
         #     id='select_factor_by_country',
         #     searchable=True
         # )
+    ]),
+    html.Div([
+        dcc.Dropdown(
+            options=[
+                {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
+                {'label': 'Social support', 'value': 'Social support'},
+                {'label': 'Health (Life Expectancy)', 'value': 'Health (Life Expectancy)'},
+                {'label': 'Freedom to make life choice', 'value': 'Freedom'},
+                {'label': 'Generosity', 'value': 'Generosity'},
+                {'label': 'Trust (Government Corruption)', 'value': 'Trust (Government Corruption)'},
+            ],
+            value='Economy (GDP per Capita)',
+            placeholder="select a factor",
+            id="select_factor",
+            style={'width': '40%', 'float': 'right', 'margin-right': '100px'}
+        ),
     ]),
     html.Div([
         # dcc.Graph(id='radar_region_economy', style={'width': '45%', 'float': 'left'}),
@@ -215,126 +220,159 @@ def getFactorInfluence(year, factor):
     ]
 )
 def percentRegionEconomy(year, way, clickData):
-    labels = ['Central and Eastern Europe',
-              'Commonwealth of Independent States',
-              'Southeast Asia',
-              'Middle East and North Africa',
-              'Western Europe',
-              'Latin America and Caribbean',
-              'North America and ANZ',
-              'Sub-Saharan Africa',
-              'East Asia',
-              'South Asia']
-    label_economy = [
-        'Developed Country',
-        'Developing Country',
-        'Least Developed Country'
-    ]
-    Central_and_Eastern_Europe = []
-    Commonwealth_of_Independent_States = []
-    Southeast_Asia = []
-    Middle_East_and_North_Africa =[]
-    Western_Europe = []
-    Latin_America_and_Caribbean = []
-    North_America_and_ANZ = []
-    sub_Saharan_Africa = []
-    east_asia = []
-    south_asia = []
     file = str(year) + "_new3.csv"
-    countries = pd.read_csv(file)
-    for index, country in countries.iterrows():
-        if country['Region'] == 'Central and Eastern Europe':
-            Central_and_Eastern_Europe.append(country['Happiness Score'])
-        elif country['Region'] == 'Commonwealth of Independent States':
-            Commonwealth_of_Independent_States.append(country['Happiness Score'])
-        elif country['Region'] == 'Southeast Asia':
-            Southeast_Asia.append(country['Happiness Score'])
-        elif country['Region'] == 'Middle East and North Africa':
-            Middle_East_and_North_Africa.append(country['Happiness Score'])
-        elif country['Region'] == 'Western Europe':
-            Western_Europe.append(country['Happiness Score'])
-        elif country['Region'] == 'Latin America and Caribbean':
-            Latin_America_and_Caribbean.append(country['Happiness Score'])
-        elif country['Region'] == 'North America and ANZ':
-            North_America_and_ANZ.append(country['Happiness Score'])
-        elif country['Region'] == 'Sub-Saharan Africa':
-            sub_Saharan_Africa.append(country['Happiness Score'])
-        elif country['Region'] == 'East Asia':
-            east_asia.append(country['Happiness Score'])
-        elif country['Region'] == 'South Asia':
-            south_asia.append(country['Happiness Score'])
     fig = go.Figure()
-    fig.add_trace(go.Box(
-        y=Central_and_Eastern_Europe,
-        name="Central and Eastern Europe",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=Commonwealth_of_Independent_States,
-        name="Commonwealth of Independent States",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=Southeast_Asia,
-        name="Southeast Asia",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=Middle_East_and_North_Africa,
-        name="Middle East and North Africa",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=Western_Europe,
-        name="Western Europe",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=Latin_America_and_Caribbean,
-        name="Latin America and Caribbean",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=North_America_and_ANZ,
-        name="North America and ANZ",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=sub_Saharan_Africa,
-        name="Sub-Saharan Africa",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=east_asia,
-        name="East Asia",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-    fig.add_trace(go.Box(
-        y=south_asia,
-        name="South Asia",
-        boxpoints=False,  # no data points
-        marker_color='rgb(9,56,125)',
-        line_color='rgb(9,56,125)'
-    ))
-
+    if way == 'Region':
+        labels = ['Central and Eastern Europe',
+                  'Commonwealth of Independent States',
+                  'Southeast Asia',
+                  'Middle East and North Africa',
+                  'Western Europe',
+                  'Latin America and Caribbean',
+                  'North America and ANZ',
+                  'Sub-Saharan Africa',
+                  'East Asia',
+                  'South Asia']
+        Central_and_Eastern_Europe = []
+        Commonwealth_of_Independent_States = []
+        Southeast_Asia = []
+        Middle_East_and_North_Africa =[]
+        Western_Europe = []
+        Latin_America_and_Caribbean = []
+        North_America_and_ANZ = []
+        sub_Saharan_Africa = []
+        east_asia = []
+        south_asia = []
+        countries = pd.read_csv(file)
+        for index, country in countries.iterrows():
+            if country['Region'] == 'Central and Eastern Europe':
+                Central_and_Eastern_Europe.append(country['Happiness Score'])
+            elif country['Region'] == 'Commonwealth of Independent States':
+                Commonwealth_of_Independent_States.append(country['Happiness Score'])
+            elif country['Region'] == 'Southeast Asia':
+                Southeast_Asia.append(country['Happiness Score'])
+            elif country['Region'] == 'Middle East and North Africa':
+                Middle_East_and_North_Africa.append(country['Happiness Score'])
+            elif country['Region'] == 'Western Europe':
+                Western_Europe.append(country['Happiness Score'])
+            elif country['Region'] == 'Latin America and Caribbean':
+                Latin_America_and_Caribbean.append(country['Happiness Score'])
+            elif country['Region'] == 'North America and ANZ':
+                North_America_and_ANZ.append(country['Happiness Score'])
+            elif country['Region'] == 'Sub-Saharan Africa':
+                sub_Saharan_Africa.append(country['Happiness Score'])
+            elif country['Region'] == 'East Asia':
+                east_asia.append(country['Happiness Score'])
+            elif country['Region'] == 'South Asia':
+                south_asia.append(country['Happiness Score'])
+        fig.add_trace(go.Box(
+            y=Central_and_Eastern_Europe,
+            name="Central and Eastern Europe",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=Commonwealth_of_Independent_States,
+            name="Commonwealth of Independent States",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=Southeast_Asia,
+            name="Southeast Asia",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=Middle_East_and_North_Africa,
+            name="Middle East and North Africa",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=Western_Europe,
+            name="Western Europe",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=Latin_America_and_Caribbean,
+            name="Latin America and Caribbean",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=North_America_and_ANZ,
+            name="North America and ANZ",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=sub_Saharan_Africa,
+            name="Sub-Saharan Africa",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=east_asia,
+            name="East Asia",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=south_asia,
+            name="South Asia",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+    elif way == 'Economy':
+        label_economy = [
+            'Developed Country',
+            'Developing Country',
+            'Least Developed Country'
+        ]
+        countries = pd.read_csv(file)
+        developed = []
+        developing = []
+        least = []
+        for index, country in countries.iterrows():
+            if country['TYPE'] == 'developed':
+                developed.append(country['Happiness Score'])
+            elif country['TYPE'] == 'developing':
+                developing.append(country['Happiness Score'])
+            else:
+                least.append(country['Happiness Score'])
+        fig.add_trace(go.Box(
+            y=developed,
+            name="Developed Country",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=developing,
+            name="Developing Country",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
+        fig.add_trace(go.Box(
+            y=least,
+            name="Least Developed Country",
+            boxpoints=False,  # no data points
+            marker_color='rgb(9,56,125)',
+            line_color='rgb(9,56,125)'
+        ))
     # values = getValue(year, way)
     # if way == 'Region':
     #     fig = go.Figure(data=go.Scatterpolar(
@@ -359,7 +397,7 @@ def percentRegionEconomy(year, way, clickData):
     # )
 
 
-    fig.update_layout(title_text="Box Plot Styling Outliers")
+    fig.update_layout(title_text="Compare with different Regions")
     fig.update_layout(plot_bgcolor="white")
     return fig
 
@@ -430,7 +468,6 @@ def percentRegionEconomy(year, way, clickData):
         Output(component_id='country_top_ten', component_property="figure"),
     ],
     [Input(component_id='select_year', component_property='value'),
-     # Input(component_id='select_region', component_property='value'),
      Input(component_id='radar_region_economy', component_property='clickData')
      ]
 )
@@ -442,6 +479,12 @@ def yearCompare(year, clickData):
         # print("clickData = ", clickData)
         # print(clickData['points'][0]['x'])
         region = clickData['points'][0]['x']
+    if region == "Developed Country":
+        region = 'developed'
+    elif region == 'Developing Country':
+        region = 'developing'
+    elif region == 'Least Developed Country':
+        region = 'least'
     container = "The year chosen by user is: {}".format(year)
     #fileName = str(year)+".csv"
     file = str(year) + "_new3.csv"
@@ -488,6 +531,42 @@ def yearCompare(year, clickData):
             generosity.append(country["Generosity"])
             trust.append(country["Trust (Government Corruption)"])
             dystopia_residual.append(country["Dystopia Residual"])
+    elif region == 'developed':
+        countries = pd.read_csv(file)
+        for index, country in countries.iterrows():
+            if country["TYPE"] == region:
+                countryName.append(country["Country"])
+                economy.append(country["Economy (GDP per Capita)"])
+                social_support.append(country["Social support"])
+                health.append(country["Health (Life Expectancy)"])
+                freedom.append(country["Freedom"])
+                generosity.append(country["Generosity"])
+                trust.append(country["Trust (Government Corruption)"])
+                dystopia_residual.append(country["Dystopia Residual"])
+    elif region == 'developing':
+        countries = pd.read_csv(file)
+        for index, country in countries.iterrows():
+            if country["TYPE"] == region:
+                countryName.append(country["Country"])
+                economy.append(country["Economy (GDP per Capita)"])
+                social_support.append(country["Social support"])
+                health.append(country["Health (Life Expectancy)"])
+                freedom.append(country["Freedom"])
+                generosity.append(country["Generosity"])
+                trust.append(country["Trust (Government Corruption)"])
+                dystopia_residual.append(country["Dystopia Residual"])
+    elif region == 'least':
+        countries = pd.read_csv(file)
+        for index, country in countries.iterrows():
+            if country["TYPE"] == region:
+                countryName.append(country["Country"])
+                economy.append(country["Economy (GDP per Capita)"])
+                social_support.append(country["Social support"])
+                health.append(country["Health (Life Expectancy)"])
+                freedom.append(country["Freedom"])
+                generosity.append(country["Generosity"])
+                trust.append(country["Trust (Government Corruption)"])
+                dystopia_residual.append(country["Dystopia Residual"])
     else:
         countries = pd.read_csv(file)
         for index, country in countries.iterrows():
