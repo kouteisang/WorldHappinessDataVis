@@ -91,11 +91,45 @@ app.layout = html.Div([
             #'margin-left':'-380px'
         ],style={'height':'450px','margin-top':'25px'}
     ),
+    html.Div(
+        [
+
+            # Output('radar_trust', 'figure'),
+            # Output('radar_freedom', 'figure'),
+            # Output('radar_health', 'figure'),
+            # Output('radar_support', 'figure'),
+            # Output('radar_generosity', 'figure'),
+
+            dcc.Graph(id='radar_economy', style={'float': 'left', 'width': '20%'}),
+            dcc.Graph(id='radar_freedom', style={'float': 'left', 'width': '20%'}),
+            dcc.Graph(id='radar_trust', style={'float': 'left', 'width': '20%'}),
+            dcc.Graph(id='radar_health', style={'float': 'left', 'width': '20%'}),
+            dcc.Graph(id='radar_support', style={'float': 'left', 'width': '20%'}),
+
+        ],
+    ),
+    html.Div([
+        dcc.Dropdown(
+            options=[
+                {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
+                {'label': 'Social support', 'value': 'Social support'},
+                {'label': 'Health (Life Expectancy)', 'value': 'Health (Life Expectancy)'},
+                {'label': 'Freedom to make life choice', 'value': 'Freedom'},
+                {'label': 'Generosity', 'value': 'Generosity'},
+                {'label': 'Trust (Government Corruption)', 'value': 'Trust (Government Corruption)'},
+            ],
+            value='Economy (GDP per Capita)',
+            placeholder="select a factor",
+            id="select_factor",
+            style={'width': '40%', 'float': 'right', 'margin-right': '100px'}
+        ),
+    ]),
     #initial parallel plot
     html.Div(
         [
-            dcc.Graph(id='factor_parallel_plot',style={'width':'100%', 'height':'500px'}),
-        ]
+            dcc.Graph(id='factor_parallel_plot',style={'width':'50%','float':'left'}),
+            dcc.Graph(id='dot_factor_graph', style={'width': '50%', 'float': 'right'})
+        ], style={'height':'500px'}
     ),
     html.Div([
         # dcc.Dropdown(
@@ -120,24 +154,7 @@ app.layout = html.Div([
         # )
     ]),
     html.Div([
-        dcc.Dropdown(
-            options=[
-                {'label': 'Economy (GDP per Capita)', 'value': 'Economy (GDP per Capita)'},
-                {'label': 'Social support', 'value': 'Social support'},
-                {'label': 'Health (Life Expectancy)', 'value': 'Health (Life Expectancy)'},
-                {'label': 'Freedom to make life choice', 'value': 'Freedom'},
-                {'label': 'Generosity', 'value': 'Generosity'},
-                {'label': 'Trust (Government Corruption)', 'value': 'Trust (Government Corruption)'},
-            ],
-            value='Economy (GDP per Capita)',
-            placeholder="select a factor",
-            id="select_factor",
-            style={'width': '40%', 'float': 'right', 'margin-right': '100px'}
-        ),
-    ]),
-    html.Div([
         # dcc.Graph(id='radar_region_economy', style={'width': '45%', 'float': 'left'}),
-        dcc.Graph(id='dot_factor_graph', style={'width': '55%', 'float': 'right'})
         # dcc.Graph(id='factors_country', style={'width': '45%', 'float': 'left', 'margin-left':'10px'})
       ]
     ),
@@ -151,7 +168,7 @@ app.layout = html.Div([
 ])
 
 #remember to change in the future
-def getValue(year, way):
+def getValue(year, way, factor):
     file = str(year) + "_new3.csv"
     countries = pd.read_csv(file)
     values = [0] * 10
@@ -173,11 +190,11 @@ def getValue(year, way):
     }
     if way == 'Region':
         for index, country in countries.iterrows():
-            values[dict.get(country['Region'])] += float(country['Happiness Score'])
+            values[dict.get(country['Region'])] += float(country[factor])
             num[dict.get(country['Region'])] += 1
     elif way == 'Economy':
         for index, country in countries.iterrows():
-            values[dict_value.get(country['TYPE'])] += float(country['Happiness Score'])
+            values[dict_value.get(country['TYPE'])] += float(country[factor])
             num[dict_value.get(country['TYPE'])] += 1
     for i in range(len(values)):
         if num[i] == 0:
@@ -590,6 +607,10 @@ def yearCompare(year, clickData):
     ])
 
     regionBar.update_layout(barmode='stack')
+    if region == 'developed' or region == 'developing':
+        region += ' countries'
+    elif region == 'least':
+        region = 'least developed countries'
     if region == 'Total Countries':
         title = "The top 10 happiest countries in {0}".format(year)
     else:
@@ -806,6 +827,87 @@ def mapClickEvent(clickData):
     figTotal.update_layout( plot_bgcolor="white")
     return factorFig, figTotal
 
+@app.callback(
+    [
+        Output('radar_economy', 'figure'),
+        Output('radar_trust', 'figure'),
+        Output('radar_freedom', 'figure'),
+        Output('radar_health', 'figure'),
+        Output('radar_support', 'figure'),
+    ],
+    [
+        Input(component_id='select_year', component_property='value'),
+        Input('select_region_economy', component_property='value')
+    ]
+)
+def radar_all(year, radar_factor):
+    file = str(year) + "_new3.csv"
+    countries = pd.read_csv(file)
+    if radar_factor == 'Region':
+        labels = ['Central and Eastern Europe',
+                  'Commonwealth of Independent States',
+                  'Southeast Asia',
+                  'Middle East and North Africa',
+                  'Western Europe',
+                  'Latin America and Caribbean',
+                  'North America and ANZ',
+                  'Sub-Saharan Africa',
+                  'East Asia',
+                  'South Asia']
+    elif radar_factor == 'Economy':
+        labels = [
+            'Developed Country',
+            'Developing Country',
+            'Least Developed Country'
+        ]
+    economy = getValue(year, radar_factor, 'Economy (GDP per Capita)')
+    fig_economy = go.Figure(data=go.Scatterpolar(
+        r=economy,
+        theta=labels,
+        fill='toself',
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    trust = getValue(year, radar_factor, 'Trust (Government Corruption)')
+    fig_trust = go.Figure(data=go.Scatterpolar(
+        r=trust,
+        theta=labels,
+        fill='toself',
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    freedom = getValue(year, radar_factor, 'Freedom')
+    fig_freedom = go.Figure(data=go.Scatterpolar(
+        r=freedom,
+        theta=labels,
+        fill='toself',
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    health = getValue(year, radar_factor, 'Health (Life Expectancy)')
+    fig_health = go.Figure(data=go.Scatterpolar(
+        r=health,
+        theta=labels,
+        fill='toself',
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    support = getValue(year, radar_factor, 'Social support')
+    fig_support = go.Figure(data=go.Scatterpolar(
+        r=support,
+        theta=labels,
+        fill='toself',
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+
+    fig_economy.update_layout(title_text="Economy")
+    fig_trust.update_layout(title_text="Trust of Government")
+    fig_freedom.update_layout(title_text="Freedom to make life Choice")
+    fig_health.update_layout(title_text="Health")
+    fig_support.update_layout(title_text="Social Support")
+
+    return fig_economy,fig_trust,fig_freedom,fig_health,fig_support
 
 
 if __name__ == '__main__':
