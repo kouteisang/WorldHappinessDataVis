@@ -51,24 +51,24 @@ app.layout = html.Div([
     #initial select region dropdown
     html.Div([
         #select area
-        dcc.Dropdown(
-            options=[
-                {'label': 'Total Countries', 'value': 'Total Countries'},
-                {'label': 'Commonwealth of Independent States', 'value': 'Commonwealth of Independent States'},
-                {'label': 'Southeast Asia', 'value': 'Southeast Asia'},
-                {'label': 'Middle East and North Africa', 'value': 'Middle East and North Africa'},
-                {'label': 'Western Europe', 'value': 'Western Europe'},
-                {'label': 'Latin America and Caribbean', 'value': 'Latin America and Caribbean'},
-                {'label': 'North America and ANZ', 'value': 'North America and ANZ'},
-                {'label': 'Sub-Saharan Africa', 'value': 'Sub-Saharan Africa'},
-                {'label': 'East Asia', 'value': 'East Asia'},
-                {'label': 'South Asia', 'value': 'South Asia'},
-            ],
-            value='Middle East and North Africa',
-            placeholder="select a factor",
-            id="select_region",
-            style={'width': '40%', 'float':'left'}
-        ),
+        # dcc.Dropdown(
+        #     options=[
+        #         {'label': 'Total Countries', 'value': 'Total Countries'},
+        #         {'label': 'Commonwealth of Independent States', 'value': 'Commonwealth of Independent States'},
+        #         {'label': 'Southeast Asia', 'value': 'Southeast Asia'},
+        #         {'label': 'Middle East and North Africa', 'value': 'Middle East and North Africa'},
+        #         {'label': 'Western Europe', 'value': 'Western Europe'},
+        #         {'label': 'Latin America and Caribbean', 'value': 'Latin America and Caribbean'},
+        #         {'label': 'North America and ANZ', 'value': 'North America and ANZ'},
+        #         {'label': 'Sub-Saharan Africa', 'value': 'Sub-Saharan Africa'},
+        #         {'label': 'East Asia', 'value': 'East Asia'},
+        #         {'label': 'South Asia', 'value': 'South Asia'},
+        #     ],
+        #     value='Middle East and North Africa',
+        #     placeholder="select a factor",
+        #     id="select_region",
+        #     style={'width': '40%', 'float':'left'}
+        # ),
         #select compare
         dcc.RadioItems(
             options=[
@@ -98,9 +98,8 @@ app.layout = html.Div([
     #initial stack area chart radar chart scatterplot
     html.Div(
         [
-            dcc.Graph(id='country_top_ten', style={'width': '33%', 'float':'left'}),
-            dcc.Graph(id='radar_region_economy', style={'width': '33%', 'float': 'left'}),
-            dcc.Graph(id='dot_factor_graph', style={'width': '33%', 'float': 'right'})
+            dcc.Graph(id='radar_region_economy', style={'width': '55%', 'float': 'left'}),
+            dcc.Graph(id='country_top_ten', style={'width': '45%', 'float':'left'}),
         ],style={'height':'450px'}
     ),
     #initial parallel plot
@@ -110,16 +109,16 @@ app.layout = html.Div([
         ]
     ),
     html.Div([
-        dcc.Dropdown(
-            options=[
-                {'label': k, 'value': k} for k in all_country_option
-            ],
-            value=['Denmark'],
-            multi=True,
-            style={'padding-left':'1%','width':'65%', 'float':'left'},
-            placeholder="Select a Country or Region to see the change of the rank of happiness during 2015-2021",
-            id='select_country',
-        ),
+        # dcc.Dropdown(
+        #     options=[
+        #         {'label': k, 'value': k} for k in all_country_option
+        #     ],
+        #     value=['Denmark'],
+        #     multi=True,
+        #     style={'padding-left':'1%','width':'65%', 'float':'left'},
+        #     placeholder="Select a Country or Region to see the change of the rank of happiness during 2015-2021",
+        #     id='select_country',
+        # ),
         # dcc.Dropdown(
         #     options=[
         #         {'label': k, 'value': k} for k in all_country_option
@@ -132,7 +131,8 @@ app.layout = html.Div([
         # )
     ]),
     html.Div([
-        dcc.Graph(id='all_country_compare_score', style={'width': '45%', 'float': 'left'}),
+        # dcc.Graph(id='radar_region_economy', style={'width': '45%', 'float': 'left'}),
+        dcc.Graph(id='dot_factor_graph', style={'width': '55%', 'float': 'right'})
         # dcc.Graph(id='factors_country', style={'width': '45%', 'float': 'left', 'margin-left':'10px'})
       ]
     ),
@@ -210,10 +210,11 @@ def getFactorInfluence(year, factor):
     Output(component_id='radar_region_economy', component_property='figure'),
     [
         Input(component_id='select_year', component_property= 'value'),
-        Input(component_id='select_region_economy', component_property= 'value')
+        Input(component_id='select_region_economy', component_property= 'value'),
+        Input(component_id='radar_region_economy', component_property='clickData')
     ]
 )
-def percentRegionEconomy(year, way):
+def percentRegionEconomy(year, way, clickData):
     labels = ['Central and Eastern Europe',
               'Commonwealth of Independent States',
               'Southeast Asia',
@@ -229,89 +230,197 @@ def percentRegionEconomy(year, way):
         'Developing Country',
         'Least Developed Country'
     ]
+    Central_and_Eastern_Europe = []
+    Commonwealth_of_Independent_States = []
+    Southeast_Asia = []
+    Middle_East_and_North_Africa =[]
+    Western_Europe = []
+    Latin_America_and_Caribbean = []
+    North_America_and_ANZ = []
+    sub_Saharan_Africa = []
+    east_asia = []
+    south_asia = []
+    file = str(year) + "_new3.csv"
+    countries = pd.read_csv(file)
+    for index, country in countries.iterrows():
+        if country['Region'] == 'Central and Eastern Europe':
+            Central_and_Eastern_Europe.append(country['Happiness Score'])
+        elif country['Region'] == 'Commonwealth of Independent States':
+            Commonwealth_of_Independent_States.append(country['Happiness Score'])
+        elif country['Region'] == 'Southeast Asia':
+            Southeast_Asia.append(country['Happiness Score'])
+        elif country['Region'] == 'Middle East and North Africa':
+            Middle_East_and_North_Africa.append(country['Happiness Score'])
+        elif country['Region'] == 'Western Europe':
+            Western_Europe.append(country['Happiness Score'])
+        elif country['Region'] == 'Latin America and Caribbean':
+            Latin_America_and_Caribbean.append(country['Happiness Score'])
+        elif country['Region'] == 'North America and ANZ':
+            North_America_and_ANZ.append(country['Happiness Score'])
+        elif country['Region'] == 'Sub-Saharan Africa':
+            sub_Saharan_Africa.append(country['Happiness Score'])
+        elif country['Region'] == 'East Asia':
+            east_asia.append(country['Happiness Score'])
+        elif country['Region'] == 'South Asia':
+            south_asia.append(country['Happiness Score'])
+    fig = go.Figure()
+    fig.add_trace(go.Box(
+        y=Central_and_Eastern_Europe,
+        name="Central and Eastern Europe",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=Commonwealth_of_Independent_States,
+        name="Commonwealth of Independent States",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=Southeast_Asia,
+        name="Southeast Asia",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=Middle_East_and_North_Africa,
+        name="Middle East and North Africa",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=Western_Europe,
+        name="Western Europe",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=Latin_America_and_Caribbean,
+        name="Latin America and Caribbean",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=North_America_and_ANZ,
+        name="North America and ANZ",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=sub_Saharan_Africa,
+        name="Sub-Saharan Africa",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=east_asia,
+        name="East Asia",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
+    fig.add_trace(go.Box(
+        y=south_asia,
+        name="South Asia",
+        boxpoints=False,  # no data points
+        marker_color='rgb(9,56,125)',
+        line_color='rgb(9,56,125)'
+    ))
 
-    values = getValue(year, way)
-    if way == 'Region':
-        fig = go.Figure(data=go.Scatterpolar(
-            r=values,
-            theta=labels,
-            fill='toself'
-        ))
-    elif way == 'Economy':
-        fig = go.Figure(data=go.Scatterpolar(
-            r=values,
-            theta=label_economy,
-            fill='toself'
-        ))
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True
-            ),
-        ),
-        showlegend=False,
-        title_text="The Happiness Average Score in Region"
-    )
+    # values = getValue(year, way)
+    # if way == 'Region':
+    #     fig = go.Figure(data=go.Scatterpolar(
+    #         r=values,
+    #         theta=labels,
+    #         fill='toself'
+    #     ))
+    # elif way == 'Economy':
+    #     fig = go.Figure(data=go.Scatterpolar(
+    #         r=values,
+    #         theta=label_economy,
+    #         fill='toself'
+    #     ))
+    # fig.update_layout(
+    #     polar=dict(
+    #         radialaxis=dict(
+    #             visible=True
+    #         ),
+    #     ),
+    #     showlegend=False,
+    #     title_text="The Happiness Average Score in Region"
+    # )
+
+
+    fig.update_layout(title_text="Box Plot Styling Outliers")
+    fig.update_layout(plot_bgcolor="white")
     return fig
 
 #input : country be chosen
 #output:countries score during 2015-2021 lien chart
-@app.callback(
-       Output(component_id='all_country_compare_score', component_property='figure'),
-        # Output(component_id='all_country_compare_rank', component_property='figure'),
-
-    [Input(component_id='select_country', component_property='value')]
-)
-def allCountryCompare(choseCountries):
-    worldCloudText = ''
-    scoreFig = go.Figure()
-    rankFig = go.Figure()
-    years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
-    for country in choseCountries:
-        happiness_score = []
-        for year in years:
-            file = pd.read_csv(str(year)+"_new3.csv")
-            for index, data in file.iterrows():
-                if data["Country"] == country:
-                    happiness_score.append(data["Happiness Score"])
-                    break
-        scoreFig.add_trace(go.Scatter(
-            x=years,
-            y=happiness_score,
-            name=country,
-            connectgaps=True
-        ))
-
-    j = 0
-    # Create figure
-    points = []
-    for country in choseCountries:
-        happiness_score = []
-        happiness_rank = []
-        for year in years:
-            file = pd.read_csv(str(year) + "_new3.csv")
-            for index, data in file.iterrows():
-                if data["Country"] == country:
-                    happiness_score.append(data["Happiness Score"])
-                    happiness_rank.append(data["Happiness Rank"])
-                    worldCloudText += ' '
-                    worldCloudText += str(year)
-                    worldCloudText += country
-                    worldCloudText += 'RANK'
-                    worldCloudText += str(data["Happiness Rank"])
-                    break
-        j += 1
-        j*= 10
-        points.append(go.Scatter(
-                x=years, y=happiness_rank,
-                mode='markers',
-                marker_size=[np.exp(int(happiness_score[i]))/10 for i in range(len(happiness_score))],
-                name=country
-            ))
-    rankFig = go.Figure(data=points)
-    scoreFig.update_layout(title_text="Countries score change from 2015 to 2021")
-    rankFig.update_layout(title_text="Countries rank change from 2015 to 2021")
-    return scoreFig
+# @app.callback(
+#        Output(component_id='all_country_compare_score', component_property='figure'),
+#         # Output(component_id='all_country_compare_rank', component_property='figure'),
+#
+#     [Input(component_id='select_country', component_property='value')]
+# )
+# def allCountryCompare(choseCountries):
+#     worldCloudText = ''
+#     scoreFig = go.Figure()
+#     rankFig = go.Figure()
+#     years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
+#     for country in choseCountries:
+#         happiness_score = []
+#         for year in years:
+#             file = pd.read_csv(str(year)+"_new3.csv")
+#             for index, data in file.iterrows():
+#                 if data["Country"] == country:
+#                     happiness_score.append(data["Happiness Score"])
+#                     break
+#         scoreFig.add_trace(go.Scatter(
+#             x=years,
+#             y=happiness_score,
+#             name=country,
+#             connectgaps=True
+#         ))
+#
+#     j = 0
+#     # Create figure
+#     points = []
+#     for country in choseCountries:
+#         happiness_score = []
+#         happiness_rank = []
+#         for year in years:
+#             file = pd.read_csv(str(year) + "_new3.csv")
+#             for index, data in file.iterrows():
+#                 if data["Country"] == country:
+#                     happiness_score.append(data["Happiness Score"])
+#                     happiness_rank.append(data["Happiness Rank"])
+#                     worldCloudText += ' '
+#                     worldCloudText += str(year)
+#                     worldCloudText += country
+#                     worldCloudText += 'RANK'
+#                     worldCloudText += str(data["Happiness Rank"])
+#                     break
+#         j += 1
+#         j*= 10
+#         points.append(go.Scatter(
+#                 x=years, y=happiness_rank,
+#                 mode='markers',
+#                 marker_size=[np.exp(int(happiness_score[i]))/10 for i in range(len(happiness_score))],
+#                 name=country
+#             ))
+#     rankFig = go.Figure(data=points)
+#     scoreFig.update_layout(title_text="Countries score change from 2015 to 2021")
+#     rankFig.update_layout(title_text="Countries rank change from 2015 to 2021")
+#     return scoreFig
 
 
 @app.callback(
@@ -321,9 +430,18 @@ def allCountryCompare(choseCountries):
         Output(component_id='country_top_ten', component_property="figure"),
     ],
     [Input(component_id='select_year', component_property='value'),
-     Input(component_id='select_region', component_property='value')]
+     # Input(component_id='select_region', component_property='value'),
+     Input(component_id='radar_region_economy', component_property='clickData')
+     ]
 )
-def yearCompare(year, region):
+def yearCompare(year, clickData):
+    region = 'Total Countries'
+    if clickData == None:
+        region = 'Total Countries'
+    else:
+        # print("clickData = ", clickData)
+        # print(clickData['points'][0]['x'])
+        region = clickData['points'][0]['x']
     container = "The year chosen by user is: {}".format(year)
     #fileName = str(year)+".csv"
     file = str(year) + "_new3.csv"
@@ -398,6 +516,7 @@ def yearCompare(year, region):
     else:
         title = "The happiness rank in {0} in {1}".format(region, year)
     regionBar.update_layout(title_text=title)
+    regionBar.update_layout(plot_bgcolor="white")
 
     return container, fig, regionBar
 
